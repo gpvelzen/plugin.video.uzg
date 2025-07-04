@@ -15,19 +15,7 @@ class KodiInfo(object):
             self.art = {'thumb': image,
                 'icon':  image,
                 'fanart': image}
-        self.video = {
-                        'aired': NpoHelpers.getAired(item),
-                        'duration': NpoHelpers.getDuration(item),
-                        'date': NpoHelpers.getDate(item),
-                        'genre': NpoHelpers.getGenres(item),
-                        'plot': NpoHelpers.getPlot(item),
-                        'premiered': NpoHelpers.getPremiered(item),
-                        'studio': NpoHelpers.getStudio(item),
-                        'title': NpoHelpers.getLabel(item),
-                        'year': NpoHelpers.getYear(item),
-                        'mediatype': 'video'
-                      }
-
+        self.videoItem = item
 class NpoInfo(object):
     def __init__(self, guid, productId, slug) -> None:
         self.guid = guid
@@ -107,18 +95,18 @@ class AllItems(object):
         result = NpoHelpers.getJsonData(url)
         uzgitemlist: List[AddonItems] = []
         for collection in result['pageProps']['dehydratedState']['queries'][0]['state']['data']['collections']:
-            url = 'https://npo.nl/start/api/domain/page-collection?guid={}'.format(collection['guid'])
+            url = 'https://npo.nl/start/api/domain/page-collection?collectionId={}'.format(collection['collectionId'])
             result = NpoHelpers.getJsonData(url)
             uzgitemlist.append(AddonItems(
                 KodiInfo(result),
-                NpoInfo(collection['guid'],None,None)
+                NpoInfo(collection['collectionId'],None,None)
                 )
             )
         return uzgitemlist
     
 class CollectionItems(object):
     def getItems(self, guid) -> List[AddonItems]:
-        url = 'https://npo.nl/start/api/domain/page-collection?guid={}'.format(guid)
+        url = 'https://npo.nl/start/api/domain/page-collection?collectionId={}'.format(guid)
         return JsonToItems.getItems(NpoHelpers.getJsonData(url))
 
 class EpisodesOfSeasonItems(object):
